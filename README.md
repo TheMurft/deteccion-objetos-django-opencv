@@ -1,129 +1,386 @@
-# 🎥 Detección de Objetos en Tiempo Real (Django + OpenCV)
+# Detección de objetos en tiempo real
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
-![Django](https://img.shields.io/badge/Django-4.x%20%7C%205.x-092E20?logo=django&logoColor=white)
-![OpenCV](https://img.shields.io/badge/OpenCV-DNN-5C3EE8?logo=opencv&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-336791?logo=postgresql&logoColor=white)
-![YOLOv8](https://img.shields.io/badge/YOLO-v8%20ONNX-FF6F00)
+Aplicación web desarrollada con **Django**, **OpenCV** y un modelo de detección de objetos tipo **YOLO exportado a ONNX**. El sistema utiliza la cámara web del computador, muestra las detecciones sobre el video y permite guardar un historial de detecciones.
 
-Aplicativo web desarrollado en Django que captura video en tiempo real desde la cámara web para detectar **mascarillas, cascos de seguridad y celulares** utilizando el módulo `cv2.dnn` de OpenCV con un modelo YOLOv8 en formato ONNX. El sistema superpone las detecciones en la transmisión en vivo y registra un historial persistente en PostgreSQL.
+## Autores
 
-> **🎓 Contexto Académico:** Construcción de Software (UNEMI)  
-> **👨‍💻 Autores:** Abarca Diego, Gianmarcos Campoverde, Xavier Granizo
+Reemplaza esta sección con los nombres reales de los integrantes del grupo:
 
----
+- Nombre del estudiante 1
 
-## ✨ Funcionalidades Principales
+- Nombre del estudiante 2
 
-* **Autenticación de Usuarios:** Sistema completo de registro e inicio de sesión para controlar el acceso al panel de monitoreo.
-* **Detección en Tiempo Real:** Transmisión de video en vivo con renderizado de *bounding boxes*, etiquetas de clase y porcentaje de confianza.
-* **Control Dinámico:** Conteo simultáneo de objetos detectados en pantalla y ajuste dinámico del umbral de confianza (*confidence threshold*).
-* **Persistencia en Base de Datos:** Almacenamiento automático de los eventos detectados en PostgreSQL, incluyendo la captura fotográfica del momento.
-* **Gestión de Historial:** Consulta de registros con filtros combinados por tipo de objeto y rango de fechas, paginación y exportación directa a formato **CSV**.
+## Funcionalidades
 
----
+- Registro e inicio de sesión de usuarios.
 
-## 🛠️ Requisitos Previos
+- Captura de video desde la cámara web.
 
-Antes de comenzar, asegúrate de contar con:
-* **Python** 3.10 o superior
-* **PostgreSQL** 14 o superior
-* **Cámara web** conectada y funcional en el equipo servidor
-* **Git**
+- Detección de objetos en tiempo real.
 
----
+- Visualización de recuadros, etiquetas y nivel de confianza.
 
-## 🚀 Instalación y Configuración
+- Ajuste del umbral de confianza.
 
-### 1. Clonar el repositorio y crear entorno virtual
-```bash
-git clone <URL_DEL_REPOSITORIO>
-cd <NOMBRE_DE_LA_CARPETA>
+- Guardado de capturas y detecciones.
 
-# Crear entorno virtual
-python -m venv venv
+- Historial de detecciones con filtros por objeto y fecha.
 
-# Activar entorno virtual
-# En Windows:
-venv\Scripts\activate
-# En Linux / macOS:
-source venv/bin/activate
+- Paginación del historial.
+
+- Exportación del historial a CSV.
+
+## Tecnologías utilizadas
+
+- Python 3.10 o superior.
+
+- Django 5.
+
+- OpenCV.
+
+- NumPy.
+
+- Pillow.
+
+- SQLite o PostgreSQL.
+
+- Modelo YOLO exportado al formato ONNX.
+
+- Git y GitHub.
+
+## Requisitos
+
+Antes de instalar el proyecto, asegúrate de tener instalado:
+
+- Python 3.10 o superior.
+
+- PyCharm.
+
+- Git.
+
+- Una cámara web.
+
+- PostgreSQL 14 o superior si vas a utilizar PostgreSQL.
+
+> Para desarrollar y probar rápidamente, puedes utilizar SQLite. SQLite no necesita instalación porque viene incluido con Python y Django.
+
+## Descargar el proyecto
+
+Clona el repositorio desde la terminal de PyCharm:
+
+```
+git clone https://github.com/R0ddy21/deteccion-objetos-unemi.git
+cd deteccion-objetos-unemi
 ```
 
-### 2. Instalar dependencias
+Después abre en PyCharm la carpeta que contiene el archivo `manage.py`.
+
+## Crear el entorno virtual en PyCharm
+
+Desde la terminal integrada de PyCharm ejecuta:
+
+```
+py -3.10 -m venv .venv
+```
+
+Activa el entorno virtual en Windows:
+
+```
+.venv\Scripts\activate
+```
+
+En Linux o macOS utiliza:
+
 ```bash
+source .venv/bin/activate
+```
+
+Si la activación fue correcta, la terminal mostrará `.venv` al inicio de la línea.
+
+## Configurar el intérprete de Python en PyCharm
+
+En PyCharm entra en:
+
+```
+File > Settings > Project > Python Interpreter
+```
+
+Selecciona el intérprete existente ubicado en:
+
+```
+.venv\Scripts\python.exe
+```
+
+En Windows, la ruta completa será parecida a:
+
+```
+C:\Users\TU_USUARIO\Documents\deteccion-objetos-unemi\.venv\Scripts\python.exe
+```
+
+## Instalar las dependencias
+
+Con el entorno virtual activado, ejecuta:
+
+```
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 3. Configurar la base de datos y variables de entorno
-1. Crea la base de datos en PostgreSQL ejecutando en tu cliente SQL o `psql`:
-   ```sql
-   CREATE DATABASE deteccion_db;
-   ```
-2. Copia el archivo de ejemplo de variables de entorno y configura tus credenciales de acceso:
-   ```bash
-   cp .env.example .env
-   ```
-   *(Asegúrate de completar los datos de conexión a PostgreSQL y la `SECRET_KEY` de Django dentro de `.env`).*
+Para comprobar que Django está instalado:
 
-### 4. Configurar el modelo de IA
-Coloca los archivos del modelo en la carpeta `modelos/` antes de iniciar el servidor (consulta la sección [Modelo de Detección](#-modelo-de-detección)).
+```
+python -m django --version
+```
 
-### 5. Ejecutar migraciones e iniciar el servidor
-```bash
-python manage.py makemigrations deteccion
+## Configurar la base de datos
+
+### Opción A: SQLite, recomendada para comenzar
+
+SQLite es la opción más sencilla para trabajar en PyCharm. No necesitas instalar PostgreSQL ni crear una base de datos manualmente.
+
+Abre el archivo:
+
+```
+config/settings.py
+```
+
+Busca la configuración `DATABASES` y reemplázala por:
+
+```python
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+```
+
+Crea un archivo `.env` en la carpeta principal del proyecto:
+
+```
+SECRET_KEY=clave-secreta-para-desarrollo
+DEBUG=True
+```
+
+Django creará automáticamente el archivo `db.sqlite3` cuando ejecutes las migraciones.
+
+### Opción B: PostgreSQL
+
+La guía de la práctica menciona PostgreSQL. Si el docente exige utilizarlo, crea una base de datos llamada:
+
+```
+deteccion_db
+```
+
+Puedes crearla desde pgAdmin o mediante SQL:
+
+```sql
+CREATE DATABASE deteccion_db;
+```
+
+Después crea el archivo `.env` en la carpeta principal del proyecto:
+
+```
+SECRET_KEY=clave-secreta-para-desarrollo
+DEBUG=True
+DB_NAME=deteccion_db
+DB_USER=postgres
+DB_PASSWORD=TU_CONTRASEÑA_DE_POSTGRES
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+En `config/settings.py`, utiliza esta configuración:
+
+```python
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DB_NAME", "deteccion_db"),
+        "USER": os.environ.get("DB_USER", "postgres"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+        "HOST": os.environ.get("DB_HOST", "localhost"),
+        "PORT": os.environ.get("DB_PORT", "5432"),
+    }
+}
+```
+
+Asegúrate de que el servicio de PostgreSQL esté iniciado.
+
+## Aplicar las migraciones
+
+Desde la terminal de PyCharm ejecuta:
+
+```
+python manage.py check
+python manage.py makemigrations
 python manage.py migrate
-python manage.py createsuperuser   # Opcional: crea un usuario administrador
+```
+
+Para crear un usuario administrador:
+
+```
+python manage.py createsuperuser
+```
+
+## Configurar el modelo de detección
+
+El código del proyecto no incluye un modelo YOLO listo para usar. El detector espera estos dos archivos:
+
+```
+modelos/
+├── modelo.onnx
+└── clases.txt
+```
+
+Abre `config/settings.py` y verifica que las rutas estén configuradas así:
+
+```python
+MODELO_ONNX = BASE_DIR / "modelos" / "modelo.onnx"
+MODELO_CLASES = BASE_DIR / "modelos" / "clases.txt"
+```
+
+> No utilices una ruta fija como `C:\Modelos\modelo.onnx`, porque solo funcionará en un computador que tenga exactamente esa carpeta.
+
+### Archivo `clases.txt`
+
+`clases.txt` debe contener una clase por línea y en el mismo orden utilizado por el modelo. Por ejemplo:
+
+```
+person
+hardhat
+mask
+cell phone
+```
+
+El contenido correcto depende del modelo que se haya utilizado para entrenar la detección.
+
+### Modelo ONNX
+
+El archivo `modelo.onnx` debe ser compatible con el detector de OpenCV y utilizar una entrada de 640 x 640 píxeles. Si tienes un modelo YOLO en formato `.pt`, puedes exportarlo con Ultralytics:
+
+```
+pip install ultralytics
+ yolo export model=best.pt format=onnx imgsz=640
+```
+
+Después cambia el nombre del archivo exportado a `modelo.onnx` y cópialo dentro de la carpeta `modelos`.
+
+Si no agregas el modelo, la aplicación puede iniciar, pero no realizará detecciones. La cámara mostrará un aviso indicando que falta `modelo.onnx`.
+
+## Ejecutar la aplicación
+
+Inicia el servidor con:
+
+```
 python manage.py runserver
 ```
-Abre tu navegador e ingresa a: **`http://127.0.0.1:8000/`**
 
----
+Abre en el navegador:
 
-## 🧠 Modelo de Detección
+```
+http://127.0.0.1:8000/
+```
 
-Por razones de tamaño y buenas prácticas, los archivos de pesos no se incluyen en el repositorio. El sistema requiere que ubiques manualmente dos archivos dentro de la carpeta `modelos/`:
-* `modelos/modelo.onnx`
-* `modelos/clases.txt` *(un nombre de clase por línea, respetando exactamente el orden del entrenamiento).*
+La cámara se abrirá en el computador donde se está ejecutando el servidor Django. Cierra otras aplicaciones que estén usando la cámara, como Zoom, Teams o Google Meet.
 
-### Consideraciones del Modelo:
-* **Formato y dimensiones:** Debe ser un modelo **YOLOv8** exportado a ONNX con una resolución de entrada de `640x640`:
-  ```bash
-  yolo export model=best.pt format=onnx imgsz=640
-  ```
-* **Clases personalizadas:** El modelo estándar entrenado con COCO (`yolov8n`) reconoce celulares (`cell phone`), pero **no** detecta mascarillas ni cascos. Para detectar los tres elementos, debes utilizar pesos entrenados con datasets personalizados (por ejemplo, de *Roboflow* o *Kaggle*) que incluyan clases como `mask`, `helmet` o `hardhat`.
-* **Mapeo de etiquetas:** Si tu modelo utiliza nombres de clase en inglés u otras variantes, puedes ajustar sus equivalencias al español en el diccionario `ALIAS` dentro de `deteccion/detector.py`.
+Para detener el servidor presiona:
 
----
+```
+Ctrl + C
+```
 
-## 🧪 Pruebas
+## Ejecutar las pruebas
 
-Para ejecutar la batería de pruebas unitarias del proyecto:
-```bash
+```
 python manage.py test
 ```
 
----
+## Estructura del proyecto
 
-## 📂 Estructura del Proyecto
-
-```text
-├── config/             # Configuración principal del proyecto Django (settings, urls, wsgi)
-├── deteccion/          # Aplicación principal
-│   ├── camara.py       # Captura y streaming de video con OpenCV
-│   ├── detector.py     # Inferencia con cv2.dnn, procesamiento ONNX y mapeo de ALIAS
-│   ├── models.py       # Modelos de base de datos para el historial de detecciones
-│   └── views.py        # Lógica de vistas, filtros y exportación CSV
-├── modelos/            # Directorio local para modelo.onnx y clases.txt (ignorado por Git)
-├── templates/          # Plantillas HTML estilizadas con Bootstrap
-├── .env.example        # Plantilla de variables de entorno
-├── manage.py           # Utilidad de línea de comandos de Django
-└── requirements.txt    # Dependencias del proyecto
+```
+deteccion-objetos-unemi/
+├── config/                Configuración principal de Django
+├── deteccion/             Aplicación de detección y modelos
+├── modelos/               modelo.onnx y clases.txt
+├── templates/             Plantillas HTML
+├── media/                 Capturas guardadas por la aplicación
+├── manage.py              Administrador de Django
+├── requirements.txt       Dependencias del proyecto
+├── .env                   Variables de entorno locales
+└── db.sqlite3             Base SQLite, si se utiliza SQLite
 ```
 
----
+## Solución de problemas
 
-## 💡 Notas de Rendimiento y Uso
+### `No module named django`
 
-* **Ejecución de la cámara:** El flujo de video captura la cámara conectada físicamente al equipo donde se ejecuta `runserver` (pensado para uso local en laboratorio).
-* **Optimización de FPS:** Si notas latencia o bajos fotogramas por segundo en equipos sin GPU dedicada, incrementa el valor de la variable `cada` dentro de `Camara.frames` en `deteccion/camara.py` (para procesar 1 de cada *N* fotogramas) o sube el umbral de confianza desde la interfaz web.
+PyCharm está utilizando otro intérprete. Selecciona `.venv\Scripts\python.exe` en la configuración del proyecto y ejecuta:
+
+```
+pip install -r requirements.txt
+```
+
+### Error de conexión con PostgreSQL
+
+Comprueba que PostgreSQL esté iniciado y que los datos de `.env` sean correctos, especialmente `DB_PASSWORD`, `DB_PORT` y `DB_NAME`.
+
+### Falta `modelo.onnx`
+
+Comprueba que existan estos archivos:
+
+```
+modelos\modelo.onnx
+modelos\clases.txt
+```
+
+También revisa la configuración de `MODELO_ONNX` y `MODELO_CLASES` en `config/settings.py`.
+
+### La cámara no funciona
+
+Cierra otros programas que la estén utilizando y verifica los permisos de cámara de Windows. El proyecto intenta abrir la cámara predeterminada con el índice `0`.
+
+### La cámara funciona, pero no hay detecciones
+
+Comprueba que el modelo y `clases.txt` correspondan entre sí. También confirma que el modelo haya sido entrenado para reconocer los objetos esperados.
+
+## Entrega de la práctica
+
+Para la entrega se recomienda incluir:
+
+- El enlace al repositorio de GitHub.
+
+- El código fuente.
+
+- `README.md`.
+
+- `requirements.txt`.
+
+- Una explicación de la instalación y ejecución.
+
+- Un video demostrativo de máximo 3 minutos.
+
+El video puede mostrar el proyecto en PyCharm, la ejecución del servidor, la cámara funcionando y las detecciones en la aplicación web.
+
+## Seguridad
+
+No subas al repositorio:
+
+- El archivo `.env`.
+
+- Contraseñas de PostgreSQL.
+
+- Archivos privados.
+
+- Bases de datos locales si contienen información real.
+
+Agrega estas líneas al archivo `.gitignore`:
+
+```
+.env
+.venv/
+db.sqlite3
+media/
+__pycache__/
+*.pyc
+```
