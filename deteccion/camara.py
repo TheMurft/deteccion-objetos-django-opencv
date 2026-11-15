@@ -31,7 +31,7 @@ class Camara:
         with self.lock:
             self.ultimas, self.ultimo = [], None
 
-    def frames(self, conf=0.5, cada=2):
+    def frames(self, conf=0.5, cada=6):
         """Generador de fotogramas JPEG; detecta cada `cada` fotogramas para ganar FPS."""
         if not self.abrir():
             return
