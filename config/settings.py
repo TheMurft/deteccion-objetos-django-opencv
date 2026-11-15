@@ -62,7 +62,7 @@ LOGIN_REDIRECT_URL = "deteccion"
 LOGOUT_REDIRECT_URL = "login"
 
 # Modelo de detecciÃ³n (YOLO en formato ONNX) y sus clases
-MODELO_ONNX = Path(r"C:\Modelos\modelo.onnx")
+MODELO_ONNX = BASE_DIR / "modelos" / "modelo.onnx"
 MODELO_CLASES = BASE_DIR / "modelos" / "clases.txt"
 
 
