@@ -25,7 +25,7 @@ Aplicativo web desarrollado en Django que captura video en tiempo real desde la 
 
 ## 🛠️ Requisitos Previos
 
-Antes de comenzar, asegúrate de contar con
+Antes de comenzar, asegúrate de contar con:
 * **Python** 3.10 o superior
 * **PostgreSQL** 14 o superior
 * **Cámara web** conectada y funcional en el equipo servidor
