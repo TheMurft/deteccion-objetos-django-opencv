@@ -56,27 +56,71 @@ class Detector:
         if not self.listo:
             return []
         alto, ancho = frame.shape[:2]
-        blob = cv2.dnn.blobFromImage(frame, 1 / 255.0, (TAM, TAM), swapRB=True, crop=False)
+        # YOLO se entrenó con letterbox: conserva la proporción de la imagen
+        # y completa el espacio restante con gris, en vez de deformar el frame.
+        escala = min(TAM / ancho, TAM / alto)
+        nuevo_ancho = int(round(ancho * escala))
+        nuevo_alto = int(round(alto * escala))
+        reducido = cv2.resize(frame, (nuevo_ancho, nuevo_alto), interpolation=cv2.INTER_LINEAR)
+        pad_x = (TAM - nuevo_ancho) // 2
+        pad_y = (TAM - nuevo_alto) // 2
+        entrada = np.full((TAM, TAM, 3), 114, dtype=np.uint8)
+        entrada[pad_y:pad_y + nuevo_alto, pad_x:pad_x + nuevo_ancho] = reducido
+        blob = cv2.dnn.blobFromImage(entrada, 1 / 255.0, (TAM, TAM), swapRB=True, crop=False)
         self.net.setInput(blob)
-        salida = self.net.forward()[0].T                  # (anclas, 4 + n_clases)
-        puntajes = salida[:, 4:]
-        ids, confs = puntajes.argmax(axis=1), puntajes.max(axis=1)
+        salida = np.asarray(self.net.forward())
+        if salida.ndim == 3:
+            salida = salida[0]
+        if salida.ndim != 2:
+            raise ValueError(f"Salida ONNX inesperada: forma {salida.shape}.")
 
-        cajas, confianzas, etiquetas = [], [], []
-        for i in np.where(confs >= conf_min)[0]:
-            nombre = self.clases[ids[i]] if ids[i] < len(self.clases) else ""
-            etiqueta = ALIAS.get(nombre)
+        dimensiones_clase = len(self.clases) + 4
+        if salida.shape[0] == dimensiones_clase:
+            salida = salida.T
+        elif salida.shape[1] != dimensiones_clase:
+            raise ValueError(
+                f"El ONNX produce {salida.shape}, pero clases.txt contiene "
+                f"{len(self.clases)} clases (se esperaban {dimensiones_clase} valores por predicción). "
+                "Verifica que clases.txt corresponda exactamente al modelo y esté en el orden de entrenamiento."
+            )
+
+        por_clase = {}
+        for prediccion in salida:
+            puntajes = prediccion[4:dimensiones_clase]
+            id_clase = int(np.argmax(puntajes))
+            confianza = float(puntajes[id_clase])
+            if confianza < conf_min or id_clase >= len(self.clases):
+                continue
+            etiqueta = ALIAS.get(self.clases[id_clase])
             if etiqueta is None:
                 continue
-            cx, cy, w, h = salida[i, :4]
-            cajas.append([int((cx - w / 2) * ancho / TAM), int((cy - h / 2) * alto / TAM),
-                          int(w * ancho / TAM), int(h * alto / TAM)])
-            confianzas.append(float(confs[i]))
-            etiquetas.append(etiqueta)
-        if not cajas:
-            return []
-        keep = np.array(cv2.dnn.NMSBoxes(cajas, confianzas, conf_min, nms)).flatten()
-        return [(etiquetas[i], confianzas[i], tuple(cajas[i])) for i in keep]
+
+            cx, cy, ancho_caja, alto_caja = map(float, prediccion[:4])
+            x1 = int(round((cx - ancho_caja / 2 - pad_x) / escala))
+            y1 = int(round((cy - alto_caja / 2 - pad_y) / escala))
+            x2 = int(round((cx + ancho_caja / 2 - pad_x) / escala))
+            y2 = int(round((cy + alto_caja / 2 - pad_y) / escala))
+            x1, x2 = np.clip([x1, x2], 0, ancho)
+            y1, y2 = np.clip([y1, y2], 0, alto)
+            caja_ancho, caja_alto = int(x2 - x1), int(y2 - y1)
+            if caja_ancho <= 0 or caja_alto <= 0:
+                continue
+            por_clase.setdefault(id_clase, []).append(
+                ([int(x1), int(y1), caja_ancho, caja_alto], confianza, etiqueta)
+            )
+
+        # NMS independiente por clase para que objetos PPE no eliminen la caja Persona.
+        resultado = []
+        for candidatos in por_clase.values():
+            cajas = [candidato[0] for candidato in candidatos]
+            confianzas = [candidato[1] for candidato in candidatos]
+            indices = cv2.dnn.NMSBoxes(cajas, confianzas, conf_min, nms)
+            if len(indices) == 0:
+                continue
+            for indice in np.asarray(indices).reshape(-1):
+                caja, confianza, etiqueta = candidatos[int(indice)]
+                resultado.append((etiqueta, confianza, tuple(caja)))
+        return resultado
 
 
 def dibujar(frame, detecciones):
