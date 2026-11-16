@@ -84,8 +84,7 @@ Abre tu navegador e ingresa a: **`http://127.0.0.1:8000/`**
 
 Por razones de tamaño y buenas prácticas, los archivos de pesos no se incluyen en el repositorio. El sistema requiere que ubiques manualmente dos archivos dentro de la carpeta `modelos/`:
 * `modelos/modelo.onnx`
-* `modelos/clases.txt` *(un nombre de clase por línea, respetando exactamente el orden del entrenamiento).*
-
+  
 ### Consideraciones del Modelo:
 * **Formato y dimensiones:** Debe ser un modelo **YOLOv8** exportado a ONNX con una resolución de entrada de `640x640`:
   ```bash
