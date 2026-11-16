@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.core.paginator import Paginator
-from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -30,13 +30,20 @@ def deteccion(request):
 
 
 @login_required
-def video_feed(request):
+@require_POST
+def procesar_frame(request):
+    archivo = request.FILES.get("frame")
+    if archivo is None:
+        return JsonResponse({"ok": False, "mensaje": "No se recibió ningún frame."}, status=400)
     try:
-        conf = min(max(float(request.GET.get("conf", 0.5)), 0.1), 0.95)
-    except ValueError:
-        conf = 0.5
-    return StreamingHttpResponse(camara.frames(conf),
-                                 content_type="multipart/x-mixed-replace; boundary=frame")
+        conf = min(max(float(request.POST.get("conf", 0.5)), 0.1), 0.95)
+        detecciones = camara.procesar_jpeg(archivo.read(), conf)
+    except (ValueError, cv2.error) as error:
+        return JsonResponse({"ok": False, "mensaje": str(error)}, status=400)
+    return JsonResponse({"ok": True, "detecciones": [
+        {"etiqueta": etiqueta, "confianza": confianza, "caja": caja}
+        for etiqueta, confianza, caja in detecciones
+    ]})
 
 
 @login_required
