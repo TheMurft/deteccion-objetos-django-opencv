@@ -8,8 +8,8 @@
 
 Aplicativo web desarrollado en Django que captura video en tiempo real desde la cámara web para detectar **mascarillas, cascos de seguridad y celulares** utilizando el módulo `cv2.dnn` de OpenCV con un modelo YOLOv8 en formato ONNX. El sistema superpone las detecciones en la transmisión en vivo y registra un historial persistente en PostgreSQL.
 
-> ** Contexto Académico:** Construcción de Software (UNEMI)  
-> ** Autores:** Abarca Diego, Gianmarcos Campoverde, Xavier Granizo
+> **Contexto Académico:** Construcción de Software (UNEMI)  
+> **Autores:** Abarca Diego, Gianmarcos Campoverde, Xavier Granizo
 
 ---
 
