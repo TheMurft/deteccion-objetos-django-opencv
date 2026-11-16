@@ -1,4 +1,4 @@
-# 🎥 Detección de Objetos en Tiempo Real (Django + OpenCV)
+# Detección de Objetos en Tiempo Real (Django + OpenCV)
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/Django-4.x%20%7C%205.x-092E20?logo=django&logoColor=white)
@@ -8,12 +8,12 @@
 
 Aplicativo web desarrollado en Django que captura video en tiempo real desde la cámara web para detectar **mascarillas, cascos de seguridad y celulares** utilizando el módulo `cv2.dnn` de OpenCV con un modelo YOLOv8 en formato ONNX. El sistema superpone las detecciones en la transmisión en vivo y registra un historial persistente en PostgreSQL.
 
-> **🎓 Contexto Académico:** Construcción de Software (UNEMI)  
-> **👨‍💻 Autores:** Abarca Diego, Gianmarcos Campoverde, Xavier Granizo
+> ** Contexto Académico:** Construcción de Software (UNEMI)  
+> ** Autores:** Abarca Diego, Gianmarcos Campoverde, Xavier Granizo
 
 ---
 
-## ✨ Funcionalidades Principales
+##  Funcionalidades Principales
 
 * **Autenticación de Usuarios:** Sistema completo de registro e inicio de sesión para controlar el acceso al panel de monitoreo.
 * **Detección en Tiempo Real:** Transmisión de video en vivo con renderizado de *bounding boxes*, etiquetas de clase y porcentaje de confianza.
@@ -23,7 +23,7 @@ Aplicativo web desarrollado en Django que captura video en tiempo real desde la 
 
 ---
 
-## 🛠️ Requisitos Previos
+##  Requisitos Previos
 
 Antes de comenzar, asegúrate de contar con:
 * **Python** 3.10 o superior
@@ -33,7 +33,7 @@ Antes de comenzar, asegúrate de contar con:
 
 ---
 
-## 🚀 Instalación y Configuración
+##  Instalación y Configuración
 
 ### 1. Clonar el repositorio y crear entorno virtual
 ```bash
@@ -80,7 +80,7 @@ Abre tu navegador e ingresa a: **`http://127.0.0.1:8000/`**
 
 ---
 
-## 🧠 Modelo de Detección
+##  Modelo de Detección
 
 Por razones de tamaño y buenas prácticas, los archivos de pesos no se incluyen en el repositorio. El sistema requiere que ubiques manualmente dos archivos dentro de la carpeta `modelos/`:
 * `modelos/modelo.onnx`
@@ -96,7 +96,7 @@ Por razones de tamaño y buenas prácticas, los archivos de pesos no se incluyen
 
 ---
 
-## 🧪 Pruebas
+##  Pruebas
 
 Para ejecutar la batería de pruebas unitarias del proyecto:
 ```bash
@@ -105,7 +105,7 @@ python manage.py test
 
 ---
 
-## 📂 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```text
 ├── config/             # Configuración principal del proyecto Django (settings, urls, wsgi)
@@ -123,7 +123,7 @@ python manage.py test
 
 ---
 
-## 💡 Notas de Rendimiento y Uso
+##  Notas de Rendimiento y Uso
 
 * **Ejecución de la cámara:** El flujo de video captura la cámara conectada físicamente al equipo donde se ejecuta `runserver` (pensado para uso local en laboratorio).
 * **Optimización de FPS:** Si notas latencia o bajos fotogramas por segundo en equipos sin GPU dedicada, incrementa el valor de la variable `cada` dentro de `Camara.frames` en `deteccion/camara.py` (para procesar 1 de cada *N* fotogramas) o sube el umbral de confianza desde la interfaz web.
